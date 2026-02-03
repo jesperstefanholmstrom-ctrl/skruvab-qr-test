@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Test QR-koder - Skruvab</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f6f8;
+      color: #333;
+    }
+    header {
+      background: #0077cc;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      margin: -20px -20px 20px -20px;
+    }
+    h1 { margin: 0; }
+    .info-box {
+      background: #e7f3ff;
+      border: 1px solid #0077cc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .info-box h3 {
+      margin-top: 0;
+      color: #0077cc;
+    }
+    .template-section {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 30px;
+    }
+    .template-section h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+    .template-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .template-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      background: #fffdf5;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .template-list li:last-child {
+      margin-bottom: 0;
+    }
+    .template-info {
+      flex: 1;
+    }
+    .download-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .download-btn:hover {
+      background: #218838;
+    }
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .qr-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+    }
+    .qr-card h3 {
+      margin-top: 0;
+      color: #0077cc;
+    }
+    .qr-card canvas {
+      margin: 10px 0;
+    }
+    .qr-details {
+      text-align: left;
+      font-size: 13px;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+    .qr-details strong {
+      color: #0077cc;
+    }
+    .customer-tag {
+      display: inline-block;
+      background: #0077cc;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .print-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .print-btn:hover {
+      background: #218838;
+    }
+    @media print {
+      .no-print { display: none; }
+      .qr-card { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="no-print">
+    <h1>Test QR-koder för Skruvab-appen</h1>
+    <p>Skanna dessa QR-koder med appen för att testa funktionaliteten</p>
+  </header>
+
+  <div class="info-box no-print">
+    <h3>📋 Instruktioner</h3>
+    <ol>
+      <li>Ladda ner XML-mallarna från sektionen nedan genom att klicka på "Ladda ner"</li>
+      <li>Ladda upp mallarna i appen (under kugghjulet/inställningar)</li>
+      <li>Skanna QR-koderna nedan med appen</li>
+      <li>Verifiera att artiklar läggs till korrekt per kund</li>
+      <li>Testa att skicka order - appen ska hitta rätt mall per kund</li>
+    </ol>
+  </div>
+
+  <div class="template-section no-print">
+    <h3>📁 Tillgängliga test-mallar</h3>
+    <p>Ladda ner och ladda upp dessa XML-filer i appen innan du testar:</p>
+    <ul class="template-list">
+      <li>
+        <div class="template-info">
+          <strong>ACME.xml</strong> - Mall för kund "ACME" (ACME Industries AB)
+        </div>
+        <button class="download-btn" onclick="downloadTemplate('ACME')">⬇️ Ladda ner</button>
+      </li>
+      <li>
+        <div class="template-info">
+          <strong>TESTAB.xml</strong> - Mall för kund "TESTAB" (Test AB)
+        </div>
+        <button class="download-btn" onclick="downloadTemplate('TESTAB')">⬇️ Ladda ner</button>
+      </li>
+      <li>
+        <div class="template-info">
+          <strong>DEMO.xml</strong> - Mall för kund "DEMO" (Demo Företag AB)
+        </div>
+        <button class="download-btn" onclick="downloadTemplate('DEMO')">⬇️ Ladda ner</button>
+      </li>
+    </ul>
+  </div>
+
+  <h2>QR-koder för kund: ACME</h2>
+  <div class="qr-grid" id="acme-qr"></div>
+
+  <h2>QR-koder för kund: TESTAB</h2>
+  <div class="qr-grid" id="testab-qr"></div>
+
+  <h2>QR-koder för kund: DEMO</h2>
+  <div class="qr-grid" id="demo-qr"></div>
+
+  <h2>QR-kod utan mall (för feltest)</h2>
+  <div class="qr-grid" id="nomatch-qr"></div>
+
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Skriv ut QR-koder</button>
+
+  <script>
+    // Base64 encoded XML templates
+    const xmlTemplates = {
+      ACME: "PE9SREVSUzQyMCBTb2Z0d2FyZU1hbnVmYWN0dXJlcj0iTW9uaXRvciBFUlAgU3lzdGVtIEFCIiBTb2Z0d2FyZU5hbWU9Ik1PTklUT1IiIFNvZnR3YXJlVmVyc2lvbj0iMjUuMi4xNS41NDIyNyI+DQogIDxPcmRlcj4NCiAgICA8SGVhZD4NCiAgICAgIDxTdXBwbGllciBTdXBwbGllckNvZGVFZGk9IjEwNTIiPg0KICAgICAgICA8TmFtZT5Ta3J1dmFiIGkgVsODwqRybmFtbyBBQjwvTmFtZT4NCiAgICAgICAgPFN0cmVldEJveDE+Qm94IDExOTwvU3RyZWV0Qm94MT4NCiAgICAgICAgPFN0cmVldEJveDI+PC9TdHJlZXRCb3gyPg0KICAgICAgICA8WmlwQ2l0eTE+MzMxIDIxIFbDg+KAnlJOQU1PPC9aaXBDaXR5MT4NCiAgICAgICAgPFppcENpdHkyPjwvWmlwQ2l0eTI+DQogICAgICAgIDxDb3VudHJ5PlN2ZXJpZ2U8L0NvdW50cnk+DQogICAgICA8L1N1cHBsaWVyPg0KICAgICAgPEJ1eWVyIEJ1eWVyQ29kZUVkaT0iMjAwMDEiPg0KICAgICAgICA8TmFtZT5BQ01FIEluZHVzdHJpZXMgQUI8L05hbWU+DQogICAgICAgIDxTdHJlZXRCb3gxPkluZHVzdHJpdsODwqRnZW4gMTA8L1N0cmVldEJveDE+DQogICAgICAgIDxTdHJlZXRCb3gyPjwvU3RyZWV0Qm94Mj4NCiAgICAgICAgPFppcENpdHkxPjEyMyA0NSBTVE9DS0hPTE08L1ppcENpdHkxPg0KICAgICAgICA8WmlwQ2l0eTI+PC9aaXBDaXR5Mj4NCiAgICAgICAgPENvdW50cnk+U3ZlcmlnZTwvQ291bnRyeT4NCiAgICAgIDwvQnV5ZXI+DQogICAgICA8UmVmZXJlbmNlcz4NCiAgICAgICAgPEJ1eWVyUmVmZXJlbmNlPkFubmEgQW5kZXJzc29uPC9CdXllclJlZmVyZW5jZT4NCiAgICAgICAgPEJ1eWVyQ29tbWVudD48L0J1eWVyQ29tbWVudD4NCiAgICAgICAgPEdvb2RzTGFiZWxpbmc+DQogICAgICAgICAgPFJvdzE+PC9Sb3cxPg0KICAgICAgICAgIDxSb3cyPjwvUm93Mj4NCiAgICAgICAgPC9Hb29kc0xhYmVsaW5nPg0KICAgICAgPC9SZWZlcmVuY2VzPg0KICAgICAgPERlbGl2ZXJ5QWRkcmVzcz4NCiAgICAgICAgPE5hbWU+QUNNRSBJbmR1c3RyaWVzIEFCPC9OYW1lPg0KICAgICAgICA8U3RyZWV0Qm94MT5JbmR1c3RyaXbDg8KkZ2VuIDEwPC9TdHJlZXRCb3gxPg0KICAgICAgICA8U3RyZWV0Qm94Mj48L1N0cmVldEJveDI+DQogICAgICAgIDxaaXBDaXR5MT4xMjMgNDUgU1RPQ0tIT0xNPC9aaXBDaXR5MT4NCiAgICAgICAgPFppcENpdHkyPjwvWmlwQ2l0eTI+DQogICAgICAgIDxDb3VudHJ5PlN2ZXJpZ2U8L0NvdW50cnk+DQogICAgICAgIDxDb21wYW55QWRyZXNzRmxhZz4xPC9Db21wYW55QWRyZXNzRmxhZz4NCiAgICAgIDwvRGVsaXZlcnlBZGRyZXNzPg0KICAgICAgPFRlcm1zPg0KICAgICAgICA8RGVsaXZlcnlUZXJtcz4NCiAgICAgICAgICA8SW5jb1Rlcm1Db21iaVRlcm0+PC9JbmNvVGVybUNvbWJpVGVybT4NCiAgICAgICAgICA8RGVsaXZlcnlNZXRob2Q+RWogdmFsdDwvRGVsaXZlcnlNZXRob2Q+DQogICAgICAgICAgPFRyYW5zcG9ydFBheWVyPkM8L1RyYW5zcG9ydFBheWVyPg0KICAgICAgICAgIDxDdXN0b21lclRyYW5zcG9ydFRpbWVEYXlzPjwvQ3VzdG9tZXJUcmFuc3BvcnRUaW1lRGF5cz4NCiAgICAgICAgPC9EZWxpdmVyeVRlcm1zPg0KICAgICAgICA8Q3VzdG9tZXJJbnZvaWNlQ29kZT5BQ01FPC9DdXN0b21lckludm9pY2VDb2RlPg0KICAgICAgICA8T3JkZXJEYXRlPjxPUkRFUl9EQVRFLz48L09yZGVyRGF0ZT4NCiAgICAgICAgPFBheW1lbnRUZXJtcz4NCiAgICAgICAgICA8VGVybXNPZlBheW1lbnREYXlzPjMwPC9UZXJtc09mUGF5bWVudERheXM+DQogICAgICAgIDwvUGF5bWVudFRlcm1zPg0KICAgICAgPC9UZXJtcz4NCiAgICAgIDxFeHBvcnQ+DQogICAgICAgIDxDdXJyZW5jeT5TRUs8L0N1cnJlbmN5Pg0KICAgICAgPC9FeHBvcnQ+DQogICAgPC9IZWFkPg0KICAgIDxSb3dzPg0KICAgICAgPE9SREVSX1JPV1MvPg0KICAgIDwvUm93cz4NCiAgPC9PcmRlcj4NCjwvT1JERVJTNDIwPg0KDQo=",
+      TESTAB: "PE9SREVSUzQyMCBTb2Z0d2FyZU1hbnVmYWN0dXJlcj0iTW9uaXRvciBFUlAgU3lzdGVtIEFCIiBTb2Z0d2FyZU5hbWU9Ik1PTklUT1IiIFNvZnR3YXJlVmVyc2lvbj0iMjUuMi4xNS41NDIyNyI+DQogIDxPcmRlcj4NCiAgICA8SGVhZD4NCiAgICAgIDxTdXBwbGllciBTdXBwbGllckNvZGVFZGk9IjEwNTIiPg0KICAgICAgICA8TmFtZT5Ta3J1dmFiIGkgVsODwqRybmFtbyBBQjwvTmFtZT4NCiAgICAgICAgPFN0cmVldEJveDE+Qm94IDExOTwvU3RyZWV0Qm94MT4NCiAgICAgICAgPFN0cmVldEJveDI+PC9TdHJlZXRCb3gyPg0KICAgICAgICA8WmlwQ2l0eTE+MzMxIDIxIFbDg+KAnlJOQU1PPC9aaXBDaXR5MT4NCiAgICAgICAgPFppcENpdHkyPjwvWmlwQ2l0eTI+DQogICAgICAgIDxDb3VudHJ5PlN2ZXJpZ2U8L0NvdW50cnk+DQogICAgICA8L1N1cHBsaWVyPg0KICAgICAgPEJ1eWVyIEJ1eWVyQ29kZUVkaT0iMzAwMDIiPg0KICAgICAgICA8TmFtZT5UZXN0IEFCPC9OYW1lPg0KICAgICAgICA8U3RyZWV0Qm94MT5UZXN0Z2F0YW4gNTwvU3RyZWV0Qm94MT4NCiAgICAgICAgPFN0cmVldEJveDI+PC9TdHJlZXRCb3gyPg0KICAgICAgICA8WmlwQ2l0eTE+NTY3IDg5IEfDg+KAk1RFQk9SRzwvWmlwQ2l0eTE+DQogICAgICAgIDxaaXBDaXR5Mj48L1ppcENpdHkyPg0KICAgICAgICA8Q291bnRyeT5TdmVyaWdlPC9Db3VudHJ5Pg0KICAgICAgPC9CdXllcj4NCiAgICAgIDxSZWZlcmVuY2VzPg0KICAgICAgICA8QnV5ZXJSZWZlcmVuY2U+RXJpayBFcmlrc3NvbjwvQnV5ZXJSZWZlcmVuY2U+DQogICAgICAgIDxCdXllckNvbW1lbnQ+PC9CdXllckNvbW1lbnQ+DQogICAgICAgIDxHb29kc0xhYmVsaW5nPg0KICAgICAgICAgIDxSb3cxPjwvUm93MT4NCiAgICAgICAgICA8Um93Mj48L1JvdzI+DQogICAgICAgIDwvR29vZHNMYWJlbGluZz4NCiAgICAgIDwvUmVmZXJlbmNlcz4NCiAgICAgIDxEZWxpdmVyeUFkZHJlc3M+DQogICAgICAgIDxOYW1lPlRlc3QgQUI8L05hbWU+DQogICAgICAgIDxTdHJlZXRCb3gxPlRlc3RnYXRhbiA1PC9TdHJlZXRCb3gxPg0KICAgICAgICA8U3RyZWV0Qm94Mj48L1N0cmVldEJveDI+DQogICAgICAgIDxaaXBDaXR5MT41NjcgODkgR8OD4oCTVEVCT1JHPC9aaXBDaXR5MT4NCiAgICAgICAgPFppcENpdHkyPjwvWmlwQ2l0eTI+DQogICAgICAgIDxDb3VudHJ5PlN2ZXJpZ2U8L0NvdW50cnk+DQogICAgICAgIDxDb21wYW55QWRyZXNzRmxhZz4xPC9Db21wYW55QWRyZXNzRmxhZz4NCiAgICAgIDwvRGVsaXZlcnlBZGRyZXNzPg0KICAgICAgPFRlcm1zPg0KICAgICAgICA8RGVsaXZlcnlUZXJtcz4NCiAgICAgICAgICA8SW5jb1Rlcm1Db21iaVRlcm0+PC9JbmNvVGVybUNvbWJpVGVybT4NCiAgICAgICAgICA8RGVsaXZlcnlNZXRob2Q+RWogdmFsdDwvRGVsaXZlcnlNZXRob2Q+DQogICAgICAgICAgPFRyYW5zcG9ydFBheWVyPkM8L1RyYW5zcG9ydFBheWVyPg0KICAgICAgICAgIDxDdXN0b21lclRyYW5zcG9ydFRpbWVEYXlzPjwvQ3VzdG9tZXJUcmFuc3BvcnRUaW1lRGF5cz4NCiAgICAgICAgPC9EZWxpdmVyeVRlcm1zPg0KICAgICAgICA8Q3VzdG9tZXJJbnZvaWNlQ29kZT5URVNUQUI8L0N1c3RvbWVySW52b2ljZUNvZGU+DQogICAgICAgIDxPcmRlckRhdGU+PE9SREVSX0RBVEUvPjwvT3JkZXJEYXRlPg0KICAgICAgICA8UGF5bWVudFRlcm1zPg0KICAgICAgICAgIDxUZXJtc09mUGF5bWVudERheXM+MzA8L1Rlcm1zT2ZQYXltZW50RGF5cz4NCiAgICAgICAgPC9QYXltZW50VGVybXM+DQogICAgICA8L1Rlcm1zPg0KICAgICAgPEV4cG9ydD4NCiAgICAgICAgPEN1cnJlbmN5PlNFSzwvQ3VycmVuY3k+DQogICAgICA8L0V4cG9ydD4NCiAgICA8L0hlYWQ+DQogICAgPFJvd3M+DQogICAgICA8T1JERVJfUk9XUy8+DQogICAgPC9Sb3dzPg0KICA8L09yZGVyPg0KPC9PUkRFUlM0MjA+DQoNCg==",
+      DEMO: "PE9SREVSUzQyMCBTb2Z0d2FyZU1hbnVmYWN0dXJlcj0iTW9uaXRvciBFUlAgU3lzdGVtIEFCIiBTb2Z0d2FyZU5hbWU9Ik1PTklUT1IiIFNvZnR3YXJlVmVyc2lvbj0iMjUuMi4xNS41NDIyNyI+DQogIDxPcmRlcj4NCiAgICA8SGVhZD4NCiAgICAgIDxTdXBwbGllciBTdXBwbGllckNvZGVFZGk9IjEwNTIiPg0KICAgICAgICA8TmFtZT5Ta3J1dmFiIGkgVsODwqRybmFtbyBBQjwvTmFtZT4NCiAgICAgICAgPFN0cmVldEJveDE+Qm94IDExOTwvU3RyZWV0Qm94MT4NCiAgICAgICAgPFN0cmVldEJveDI+PC9TdHJlZXRCb3gyPg0KICAgICAgICA8WmlwQ2l0eTE+MzMxIDIxIFbDg+KAnlJOQU1PPC9aaXBDaXR5MT4NCiAgICAgICAgPFppcENpdHkyPjwvWmlwQ2l0eTI+DQogICAgICAgIDxDb3VudHJ5PlN2ZXJpZ2U8L0NvdW50cnk+DQogICAgICA8L1N1cHBsaWVyPg0KICAgICAgPEJ1eWVyIEJ1eWVyQ29kZUVkaT0iNDAwMDMiPg0KICAgICAgICA8TmFtZT5EZW1vIEbDg8K2cmV0YWcgQUI8L05hbWU+DQogICAgICAgIDxTdHJlZXRCb3gxPkRlbW92w4PCpGdlbiAxMjM8L1N0cmVldEJveDE+DQogICAgICAgIDxTdHJlZXRCb3gyPjwvU3RyZWV0Qm94Mj4NCiAgICAgICAgPFppcENpdHkxPjExMSAyMiBNQUxNw4PigJM8L1ppcENpdHkxPg0KICAgICAgICA8WmlwQ2l0eTI+PC9aaXBDaXR5Mj4NCiAgICAgICAgPENvdW50cnk+U3ZlcmlnZTwvQ291bnRyeT4NCiAgICAgIDwvQnV5ZXI+DQogICAgICA8UmVmZXJlbmNlcz4NCiAgICAgICAgPEJ1eWVyUmVmZXJlbmNlPkRlbW8gUGVyc29uPC9CdXllclJlZmVyZW5jZT4NCiAgICAgICAgPEJ1eWVyQ29tbWVudD48L0J1eWVyQ29tbWVudD4NCiAgICAgICAgPEdvb2RzTGFiZWxpbmc+DQogICAgICAgICAgPFJvdzE+PC9Sb3cxPg0KICAgICAgICAgIDxSb3cyPjwvUm93Mj4NCiAgICAgICAgPC9Hb29kc0xhYmVsaW5nPg0KICAgICAgPC9SZWZlcmVuY2VzPg0KICAgICAgPERlbGl2ZXJ5QWRkcmVzcz4NCiAgICAgICAgPE5hbWU+RGVtbyBGw4PCtnJldGFnIEFCPC9OYW1lPg0KICAgICAgICA8U3RyZWV0Qm94MT5EZW1vdsODwqRnZW4gMTIzPC9TdHJlZXRCb3gxPg0KICAgICAgICA8U3RyZWV0Qm94Mj48L1N0cmVldEJveDI+DQogICAgICAgIDxaaXBDaXR5MT4xMTEgMjIgTUFMTcOD4oCTPC9aaXBDaXR5MT4NCiAgICAgICAgPFppcENpdHkyPjwvWmlwQ2l0eTI+DQogICAgICAgIDxDb3VudHJ5PlN2ZXJpZ2U8L0NvdW50cnk+DQogICAgICAgIDxDb21wYW55QWRyZXNzRmxhZz4xPC9Db21wYW55QWRyZXNzRmxhZz4NCiAgICAgIDwvRGVsaXZlcnlBZGRyZXNzPg0KICAgICAgPFRlcm1zPg0KICAgICAgICA8RGVsaXZlcnlUZXJtcz4NCiAgICAgICAgICA8SW5jb1Rlcm1Db21iaVRlcm0+PC9JbmNvVGVybUNvbWJpVGVybT4NCiAgICAgICAgICA8RGVsaXZlcnlNZXRob2Q+RWogdmFsdDwvRGVsaXZlcnlNZXRob2Q+DQogICAgICAgICAgPFRyYW5zcG9ydFBheWVyPkM8L1RyYW5zcG9ydFBheWVyPg0KICAgICAgICAgIDxDdXN0b21lclRyYW5zcG9ydFRpbWVEYXlzPjwvQ3VzdG9tZXJUcmFuc3BvcnRUaW1lRGF5cz4NCiAgICAgICAgPC9EZWxpdmVyeVRlcm1zPg0KICAgICAgICA8Q3VzdG9tZXJJbnZvaWNlQ29kZT5ERU1PPC9DdXN0b21lckludm9pY2VDb2RlPg0KICAgICAgICA8T3JkZXJEYXRlPjxPUkRFUl9EQVRFLz48L09yZGVyRGF0ZT4NCiAgICAgICAgPFBheW1lbnRUZXJtcz4NCiAgICAgICAgICA8VGVybXNPZlBheW1lbnREYXlzPjMwPC9UZXJtc09mUGF5bWVudERheXM+DQogICAgICAgIDwvUGF5bWVudFRlcm1zPg0KICAgICAgPC9UZXJtcz4NCiAgICAgIDxFeHBvcnQ+DQogICAgICAgIDxDdXJyZW5jeT5TRUs8L0N1cnJlbmN5Pg0KICAgICAgPC9FeHBvcnQ+DQogICAgPC9IZWFkPg0KICAgIDxSb3dzPg0KICAgICAgPE9SREVSX1JPV1MvPg0KICAgIDwvUm93cz4NCiAgPC9PcmRlcj4NCjwvT1JERVJTNDIwPg0KDQo=",
+    };
+
+    // Function to download a template
+    function downloadTemplate(name) {
+      const base64Data = xmlTemplates[name];
+      if (!base64Data) {
+        alert('Mall hittades inte: ' + name);
+        return;
+      }
+
+      // Decode base64 to text
+      const xmlContent = atob(base64Data);
+
+      // Create blob and download link
+      const blob = new Blob([xmlContent], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name + '.xml';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Test data - articles for different customers
+    const testArticles = {
+      ACME: [
+        {
+          customer: "ACME",
+          skruvabArticleNumber: "SKR-1001",
+          customerArticleNumber: "ACME-A100",
+          name: "Sexkantsskruv M8x30",
+          amount: 100,
+          location: "A1-01",
+          misc: ""
+        },
+        {
+          customer: "ACME",
+          skruvabArticleNumber: "SKR-1002",
+          customerArticleNumber: "ACME-A101",
+          name: "Mutter M8",
+          amount: 200,
+          location: "A1-02",
+          misc: ""
+        },
+        {
+          customer: "ACME",
+          skruvabArticleNumber: "SKR-2001",
+          customerArticleNumber: "ACME-B200",
+          name: "Bricka 8mm",
+          amount: 500,
+          location: "B2-15",
+          misc: ""
+        }
+      ],
+      TESTAB: [
+        {
+          customer: "TESTAB",
+          skruvabArticleNumber: "SKR-3001",
+          customerArticleNumber: "TST-001",
+          name: "Insexskruv M6x20",
+          amount: 50,
+          location: "C3-01",
+          misc: ""
+        },
+        {
+          customer: "TESTAB",
+          skruvabArticleNumber: "SKR-3002",
+          customerArticleNumber: "TST-002",
+          name: "Lasmutter M6",
+          amount: 50,
+          location: "C3-02",
+          misc: ""
+        }
+      ],
+      DEMO: [
+        {
+          customer: "DEMO",
+          skruvabArticleNumber: "SKR-4001",
+          customerArticleNumber: "DEM-X1",
+          name: "Traskruv 4x40",
+          amount: 1000,
+          location: "D1-01",
+          misc: ""
+        },
+        {
+          customer: "DEMO",
+          skruvabArticleNumber: "SKR-4002",
+          customerArticleNumber: "DEM-X2",
+          name: "Sparskruv 3x20",
+          amount: 250,
+          location: "D1-02",
+          misc: ""
+        }
+      ],
+      NOMATCH: [
+        {
+          customer: "NOKUND",
+          skruvabArticleNumber: "SKR-9999",
+          customerArticleNumber: "UNK-001",
+          name: "Testprodukt",
+          amount: 10,
+          location: "X9-99",
+          misc: ""
+        }
+      ]
+    };
+
+    function createQRCard(article, container) {
+      const card = document.createElement('div');
+      card.className = 'qr-card';
+
+      const tag = document.createElement('div');
+      tag.className = 'customer-tag';
+      tag.textContent = `Kund: ${article.customer}`;
+      card.appendChild(tag);
+
+      const title = document.createElement('h3');
+      title.textContent = article.name;
+      card.appendChild(title);
+
+      const qrContainer = document.createElement('div');
+      qrContainer.style.display = 'inline-block';
+      qrContainer.style.margin = '10px 0';
+      card.appendChild(qrContainer);
+
+      const details = document.createElement('div');
+      details.className = 'qr-details';
+      details.innerHTML = `
+        <div><strong>Skruvab art.nr:</strong> ${article.skruvabArticleNumber}</div>
+        <div><strong>Kund art.nr:</strong> ${article.customerArticleNumber || '-'}</div>
+        <div><strong>Antal:</strong> ${article.amount}</div>
+        <div><strong>Plats:</strong> ${article.location}</div>
+        <div><strong>Övrigt:</strong> ${article.misc || '-'}</div>
+      `;
+      card.appendChild(details);
+
+      container.appendChild(card);
+
+      // Generate QR code using qrcodejs
+      const qrData = JSON.stringify(article);
+      new QRCode(qrContainer, {
+        text: qrData,
+        width: 250,
+        height: 250,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    }
+
+    // Generate QR codes for each customer
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, QRCode available:', typeof QRCode !== 'undefined');
+
+      if (typeof QRCode === 'undefined') {
+        document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50px;">QRCode library failed to load. Check your internet connection and refresh.</h1>';
+        return;
+      }
+
+      try {
+        console.log('Generating ACME QR codes...');
+        testArticles.ACME.forEach(article => {
+          createQRCard(article, document.getElementById('acme-qr'));
+        });
+
+        console.log('Generating TESTAB QR codes...');
+        testArticles.TESTAB.forEach(article => {
+          createQRCard(article, document.getElementById('testab-qr'));
+        });
+
+        console.log('Generating DEMO QR codes...');
+        testArticles.DEMO.forEach(article => {
+          createQRCard(article, document.getElementById('demo-qr'));
+        });
+
+        console.log('Generating NOMATCH QR codes...');
+        testArticles.NOMATCH.forEach(article => {
+          createQRCard(article, document.getElementById('nomatch-qr'));
+        });
+
+        console.log('All QR codes generated successfully!');
+      } catch (e) {
+        console.error('Error generating QR codes:', e);
+        alert('Error generating QR codes: ' + e.message);
+      }
+    });
+  </script>
+</body>
+</html>
+
